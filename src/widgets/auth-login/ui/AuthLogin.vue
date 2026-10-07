@@ -1,22 +1,17 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
-import { object, string } from 'yup'
 import { useLogin, useSession } from '@/entities/session'
-import { Icon } from '@/shared/ui/icon'
+import { BaseButton } from '@/shared/ui/button'
+import { BaseInput } from '@/shared/ui/input'
+import { loginSchema, type LoginValues } from '../model/schema'
 
 const router = useRouter()
 const session = useSession()
 const { mutate, isPending } = useLogin()
 
-const showPassword = ref(false)
-
-const { errors, defineField, handleSubmit, setErrors, submitCount } = useForm({
-  validationSchema: object({
-    email: string().trim().required('Введите почту').email('Некорректная почта'),
-    password: string().required('Введите пароль'),
-  }),
+const { errors, defineField, handleSubmit, setErrors, submitCount } = useForm<LoginValues>({
+  validationSchema: loginSchema,
   initialValues: { email: '', password: '' },
 })
 
@@ -39,9 +34,6 @@ const onSubmit = handleSubmit((values) => {
     onError: () => setErrors({ email: SERVER_ERROR, password: SERVER_ERROR }),
   })
 })
-
-const invalidClass =
-  'border-red-500 bg-red-50/50 ring-4 ring-red-100 focus:border-red-500 focus:ring-red-100'
 </script>
 
 <template>
@@ -51,77 +43,39 @@ const invalidClass =
       Войдите в свой аккаунт
     </p>
 
-    <form class="reveal mt-10 space-y-5" style="--d: 120ms" novalidate @submit="onSubmit">
-      <label class="block">
-        <span class="mb-2 block text-sm font-semibold">Почта</span>
-        <div class="relative">
-          <Icon
-            name="mail"
-            size="20"
-            class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-soft"
-          />
-          <input
-            v-model="email"
-            class="input pl-12"
-            :class="errors.email && invalidClass"
-            type="email"
-            autocomplete="email"
-            placeholder="name@example.com"
-          />
-        </div>
-        <Transition name="msg">
-          <p v-if="errors.email?.trim()" class="mt-2 text-sm text-red-600">{{ errors.email }}</p>
-        </Transition>
-      </label>
-      <label class="block">
-        <span class="mb-2 block text-sm font-semibold">Пароль</span>
-        <div class="relative">
-          <Icon
-            name="lock"
-            size="20"
-            class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-ink-soft"
-          />
-          <input
-            v-model="password"
-            class="input px-12"
-            :class="errors.password && invalidClass"
-            :type="showPassword ? 'text' : 'password'"
-            autocomplete="current-password"
-            placeholder="Введите пароль"
-          />
-          <button
-            type="button"
-            class="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-ink-soft transition hover:text-ink"
-            :aria-label="showPassword ? 'Скрыть пароль' : 'Показать пароль'"
-            @click="showPassword = !showPassword"
-          >
-            <Transition name="icon-swap" mode="out-in">
-              <Icon
-                :key="String(showPassword)"
-                :name="showPassword ? 'eye' : 'eye-off'"
-                size="20"
-              />
-            </Transition>
-          </button>
-        </div>
-        <Transition name="msg">
-          <p v-if="errors.password?.trim()" class="mt-2 text-sm text-red-600">
-            {{ errors.password }}
-          </p>
-        </Transition>
-        <p class="mt-3 text-sm text-ink-soft">
-          Забыли пароль?
-          <button type="button" class="font-semibold text-brand hover:underline">Сбросить</button>
-        </p>
-      </label>
+    <form class="reveal mt-10" style="--d: 120ms" novalidate @submit="onSubmit">
+      <BaseInput
+        v-model="email"
+        label="Почта"
+        type="email"
+        icon="mail"
+        autocomplete="email"
+        placeholder="name@example.com"
+        :error="errors.email"
+      />
 
-      <button class="btn w-full" type="submit" :disabled="isPending">
-        <span
-          v-if="isPending"
-          class="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"
-        />
+      <BaseInput
+        v-model="password"
+        label="Пароль"
+        type="password"
+        icon="lock"
+        autocomplete="current-password"
+        placeholder="Введите пароль"
+        :error="errors.password"
+      >
+        <template #hint>
+          <p class="mt-3 text-sm text-ink-soft">
+            Забыли пароль?
+            <RouterLink to="/reset-password" class="font-semibold text-brand hover:underline">
+              Сбросить
+            </RouterLink>
+          </p>
+        </template>
+      </BaseInput>
+
+      <BaseButton class="mt-5" type="submit" :loading="isPending">
         {{ isPending ? 'Входим…' : 'Войти' }}
-      </button>
+      </BaseButton>
     </form>
 
     <div class="reveal my-6 flex items-center gap-4 text-sm text-ink-soft" style="--d: 180ms">
@@ -130,6 +84,8 @@ const invalidClass =
       <span class="h-px flex-1 bg-line" />
     </div>
 
-    <button type="button" class="btn-outline reveal" style="--d: 240ms">Регистрация</button>
+    <BaseButton class="reveal" variant="secondary" to="/registration" style="--d: 240ms">
+      Регистрация
+    </BaseButton>
   </div>
 </template>
