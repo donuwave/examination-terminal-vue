@@ -130,12 +130,19 @@ const percent = (item: TestProgress) =>
           </span>
         </template>
         <template v-else>
-          <span
-            v-if="test.access_test"
-            class="inline-flex shrink-0 rounded-full bg-pastel-mint px-2.5 py-1 text-xs font-semibold text-emerald-800"
-          >
-            Доступ открыт
-          </span>
+          <div v-if="test.access_test" class="flex shrink-0 items-center gap-3">
+            <span
+              class="inline-flex rounded-full bg-pastel-mint px-2.5 py-1 text-xs font-semibold text-emerald-800"
+            >
+              Доступ открыт
+            </span>
+            <RouterLink
+              :to="{ name: 'test-results', params: { id: course.id, testId: test.id } }"
+              class="rounded-xl bg-canvas px-4 py-2 text-sm font-semibold transition duration-200 hover:-translate-y-0.5 hover:bg-line active:scale-[.98]"
+            >
+              Результаты
+            </RouterLink>
+          </div>
           <button
             v-else
             type="button"

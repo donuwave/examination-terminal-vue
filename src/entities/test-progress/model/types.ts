@@ -28,3 +28,18 @@ export interface AnswerPayload {
   id: number
   student_answer: string | null
 }
+
+/** Строка результатов теста для преподавателя: один студент курса. */
+export interface TestResultRow {
+  progress_id: number
+  student: {
+    id: number
+    email: string
+    first_name: string | null
+    last_name: string | null
+  }
+  status: ProgressStatus
+  count_current_answer: number | null
+  questions_total: number
+  attempt_date: number | null
+}
