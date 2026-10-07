@@ -11,12 +11,10 @@ export { useCategories } from './api/useCategories'
 export { useCatalog, useEnrollCourse } from './api/useCatalog'
 export { useCourse } from './api/useCourse'
 export {
-  useAddStudents,
   useCreateCourse,
   useDeleteCourse,
   useLeaveCourse,
   useRemoveStudent,
-  useStudentCandidates,
   useUpdateCourse,
 } from './api/useCourseActions'
 export { personInitials, personName } from './lib/person-name'

@@ -12,11 +12,9 @@ import { pluralize } from '@/shared/lib'
 import { ConfirmDialog } from '@/shared/ui/confirm-dialog'
 import { Icon } from '@/shared/ui/icon'
 import { toastSuccess } from '@/shared/ui/toast'
-import AddStudentsDialog from './AddStudentsDialog.vue'
 
 const props = defineProps<{ course: CourseDetails }>()
 
-const addOpen = ref(false)
 const removeOpen = ref(false)
 const toRemove = ref<CourseStudent | null>(null)
 
@@ -47,14 +45,6 @@ const confirmRemove = () => {
           {{ course.students.length }}
           {{ pluralize(course.students.length, ['человек', 'человека', 'человек']) }}
         </span>
-        <button
-          type="button"
-          class="inline-flex items-center gap-1.5 rounded-xl bg-brand-soft px-3.5 py-2 text-sm font-semibold text-brand transition duration-200 hover:-translate-y-0.5 active:scale-[.98]"
-          @click="addOpen = true"
-        >
-          <Icon name="plus" size="18" />
-          Добавить
-        </button>
       </div>
     </div>
 
@@ -87,10 +77,10 @@ const confirmRemove = () => {
 
     <div v-else class="card mt-5 flex flex-col items-center px-6 py-8 text-center">
       <p class="font-bold">В курсе пока никого нет</p>
-      <p class="mt-1 text-sm text-ink-soft">Добавьте студентов, и они увидят материалы и тесты.</p>
+      <p class="mt-1 text-sm text-ink-soft">
+        Студенты записываются на курс сами через каталог «Все курсы».
+      </p>
     </div>
-
-    <AddStudentsDialog v-model="addOpen" :course-id="course.id" />
 
     <ConfirmDialog
       v-model="removeOpen"
