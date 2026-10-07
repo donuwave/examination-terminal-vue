@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { RouterLink } from 'vue-router'
 
-export type ButtonVariant = 'primary' | 'secondary'
+export type ButtonVariant = 'primary' | 'secondary' | 'danger'
 
 const props = withDefaults(
   defineProps<{
@@ -20,6 +20,8 @@ const variants: Record<ButtonVariant, string> = {
   primary:
     'bg-brand text-white shadow-[0_6px_16px_-6px_rgba(47,107,255,.6)] hover:shadow-[0_10px_20px_-6px_rgba(47,107,255,.6)]',
   secondary: 'bg-neutral-200 text-ink hover:bg-neutral-300 hover:shadow-card',
+  danger:
+    'bg-red-500 text-white shadow-[0_6px_16px_-6px_rgba(239,68,68,.6)] hover:bg-red-600 hover:shadow-[0_10px_20px_-6px_rgba(239,68,68,.6)]',
 }
 
 const classes = computed(() => [

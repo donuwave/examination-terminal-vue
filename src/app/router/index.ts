@@ -30,7 +30,12 @@ const router = createRouter({
       path: '/',
       component: () => import('@/app/layouts/AppLayout.vue'),
       meta: { requiresAuth: true },
-      children: [{ path: '', name: 'home', component: () => import('@/pages/home') }],
+      children: [
+        { path: '', name: 'home', component: () => import('@/pages/home') },
+        { path: 'courses', name: 'courses', component: () => import('@/pages/courses') },
+        { path: 'profile', name: 'profile', component: () => import('@/pages/profile') },
+        { path: 'courses/:id', name: 'course', component: () => import('@/pages/course') },
+      ],
     },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],

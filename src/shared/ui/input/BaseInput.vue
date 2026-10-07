@@ -7,6 +7,8 @@ const props = defineProps<{
   type?: 'text' | 'email' | 'password'
   placeholder?: string
   autocomplete?: string
+  inputmode?: 'text' | 'numeric'
+  maxlength?: number
   /** Иконка слева. */
   icon?: IconName
   /** Текст ошибки. Пробел подсвечивает поле, но текст не показывает. */
@@ -42,6 +44,8 @@ const inputType = computed(() => (isPassword.value && revealed.value ? 'text' : 
         ]"
         :type="inputType"
         :autocomplete="autocomplete"
+        :inputmode="inputmode"
+        :maxlength="maxlength"
         :placeholder="placeholder"
       />
       <button
