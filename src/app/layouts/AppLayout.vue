@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import { ToastHost } from '@/shared/ui/toast'
 </script>
 
 <template>
-  <RouterView />
-  <ToastHost />
+  <main class="p-6">
+    <RouterView />
+  </main>
 </template>

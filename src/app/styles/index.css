@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-canvas font-sans text-ink antialiased;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-card border border-line bg-white shadow-card;
+  }
+  .input {
+    @apply w-full rounded-2xl border border-line bg-white px-4 py-3.5 text-[15px] outline-none transition duration-200 hover:border-ink/20 placeholder:text-ink-soft/60 focus:border-brand focus:ring-4 focus:ring-brand-soft;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-brand px-5 py-3.5 text-[15px] font-semibold text-white shadow-[0_6px_16px_-6px_rgba(47,107,255,.6)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_20px_-6px_rgba(47,107,255,.6)] active:translate-y-0 active:scale-[.98] disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-60 disabled:shadow-none;
+  }
+  .btn-outline {
+    @apply w-full rounded-2xl border border-line bg-white px-5 py-3.5 text-[15px] font-semibold transition duration-200 hover:-translate-y-0.5 hover:border-ink/20 hover:shadow-card active:translate-y-0 active:scale-[.98];
+  }
+  .reveal {
+    animation: reveal 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    animation-delay: var(--d, 0ms);
+  }
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+.icon-swap-enter-active,
+.icon-swap-leave-active {
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+.icon-swap-enter-from,
+.icon-swap-leave-to {
+  opacity: 0;
+  transform: scale(0.6) rotate(-20deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.toast-enter-active,
+.toast-leave-active {
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.toast-leave-active {
+  position: absolute;
+}
+.toast-move {
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translateX(-24px) scale(0.96);
+}
+.toast-timer {
+  animation: toast-timer 5s linear forwards;
+}
+@keyframes toast-timer {
+  to {
+    transform: scaleX(0);
+  }
+}
+
+.msg-enter-active,
+.msg-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+.msg-enter-from,
+.msg-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}

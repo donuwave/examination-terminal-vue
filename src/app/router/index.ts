@@ -1,72 +1,24 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomePage from '@/pages/home-page.vue'
-import AuthPage from '@/pages/auth-page.vue'
 import { useSession } from '@/entities/session'
-import { createPinia, setActivePinia } from 'pinia'
-import CourseListPage from '@/pages/course-list-page.vue'
-import DefaultLayout from '@/app/layout/default-layout.vue'
-import AuthLayout from '@/app/layout/auth-layout.vue'
-import CoursePage from '@/pages/course-page.vue'
-import TestProgressPage from '@/pages/test-progress-page.vue'
-
-const pinia = createPinia()
-setActivePinia(pinia)
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes: [
+    { path: '/auth', name: 'auth', component: () => import('@/pages/auth') },
     {
       path: '/',
-      name: 'home',
-      component: HomePage,
-      meta: { requiresAuth: true, layout: DefaultLayout },
+      component: () => import('@/app/layouts/AppLayout.vue'),
+      meta: { requiresAuth: true },
+      children: [{ path: '', name: 'home', component: () => import('@/pages/home') }],
     },
-    {
-      path: '/auth',
-      name: 'auth',
-      component: AuthPage,
-      meta: { layout: AuthLayout },
-    },
-    {
-      path: '/courses',
-      meta: { requiresAuth: true, layout: DefaultLayout },
-      children: [
-        {
-          path: '',
-          name: 'courses',
-          component: CourseListPage,
-        },
-        {
-          path: ':id',
-          name: 'course-item',
-          component: CoursePage,
-        },
-      ],
-    },
-    {
-      path: '/courses/:id/progress-test',
-      name: 'progress-test',
-      children: [{ path: ':id', name: 'progress-test-item', component: TestProgressPage }],
-    },
+    { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
 })
 
-router.beforeEach(async (to, from, next) => {
-  const sessionStore = useSession()
-  const loggedIn = !!sessionStore.accessToken
-
-  if (to.meta.requiresAuth && !loggedIn) {
-    if (to.name !== 'auth') {
-      return next({ name: 'auth' })
-    }
-    return next()
-  }
-
-  if (to.name === 'auth' && loggedIn) {
-    return next({ name: 'home' })
-  }
-
-  next()
+router.beforeEach((to) => {
+  const { isAuthed } = useSession()
+  if (to.meta.requiresAuth && !isAuthed) return { name: 'auth' }
+  if (to.name === 'auth' && isAuthed) return { name: 'home' }
 })
 
 export default router
