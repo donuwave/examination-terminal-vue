@@ -1,23 +1,34 @@
 <script setup lang="ts">
 import { watch } from 'vue'
-import { useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
-import { courseSchema, useCategories, useCreateCourse, type CourseValues } from '@/entities/course'
+import {
+  courseSchema,
+  useCategories,
+  useUpdateCourse,
+  type CourseDetails,
+  type CourseValues,
+} from '@/entities/course'
 import { BaseButton } from '@/shared/ui/button'
 import { BaseDialog } from '@/shared/ui/dialog'
 import { BaseInput } from '@/shared/ui/input'
 import { BaseTextarea } from '@/shared/ui/textarea'
 import { toastSuccess } from '@/shared/ui/toast'
 
+const props = defineProps<{ course: CourseDetails }>()
 const open = defineModel<boolean>({ default: false })
 
-const router = useRouter()
 const { data: categories } = useCategories()
-const { mutate, isPending } = useCreateCourse()
+const { mutate, isPending } = useUpdateCourse(() => props.course.id)
 
-const { errors, defineField, handleSubmit, submitCount, resetForm } = useForm<CourseValues>({
+const initial = (): CourseValues => ({
+  name: props.course.name,
+  description: props.course.description,
+  categoryId: props.course.category?.id as number,
+})
+
+const { errors, defineField, handleSubmit, submitCount, resetForm, meta } = useForm<CourseValues>({
   validationSchema: courseSchema,
-  initialValues: { name: '', description: '' },
+  initialValues: initial(),
 })
 
 // До первой отправки поля не валидируются, дальше проверяются при каждом изменении.
@@ -29,38 +40,25 @@ const [categoryId] = defineField('categoryId', config)
 const onSubmit = handleSubmit((values) => {
   if (isPending.value) return
   mutate(values, {
-    onSuccess: ({ id }) => {
+    onSuccess: () => {
       open.value = false
-      toastSuccess('Курс создан')
-      router.push({ name: 'course', params: { id } })
+      toastSuccess('Курс обновлён')
     },
   })
 })
 
 watch(open, (isOpen) => {
-  if (!isOpen) resetForm()
+  if (isOpen) resetForm({ values: initial() })
 })
 </script>
 
 <template>
-  <BaseDialog v-model="open" title="Новый курс" max-width="max-w-lg">
-    <h2 class="text-xl font-extrabold">Новый курс</h2>
-    <p class="mt-1 text-sm text-ink-soft">Студентов и тесты можно будет добавить позже.</p>
+  <BaseDialog v-model="open" title="Редактировать курс" max-width="max-w-lg">
+    <h2 class="text-xl font-extrabold">Редактировать курс</h2>
 
     <form class="mt-6" novalidate @submit="onSubmit">
-      <BaseInput
-        v-model="name"
-        label="Название"
-        placeholder="Например, Линейная алгебра"
-        :error="errors.name"
-      />
-      <BaseTextarea
-        v-model="description"
-        label="Описание"
-        placeholder="О чём курс и чему научатся студенты"
-        :rows="4"
-        :error="errors.description"
-      />
+      <BaseInput v-model="name" label="Название" :error="errors.name" />
+      <BaseTextarea v-model="description" label="Описание" :rows="4" :error="errors.description" />
 
       <div>
         <span class="mb-2 block text-sm font-semibold">Тип курса</span>
@@ -95,8 +93,8 @@ watch(open, (isOpen) => {
         <BaseButton variant="secondary" :disabled="isPending" @click="open = false">
           Отмена
         </BaseButton>
-        <BaseButton type="submit" :loading="isPending">
-          {{ isPending ? 'Создаём…' : 'Создать курс' }}
+        <BaseButton type="submit" :loading="isPending" :disabled="!meta.dirty">
+          {{ isPending ? 'Сохраняем…' : 'Сохранить' }}
         </BaseButton>
       </div>
     </form>

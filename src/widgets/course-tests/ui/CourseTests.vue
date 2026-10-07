@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { courseColor, type CourseDetails } from '@/entities/course'
 import { StatusChip, useTestProgress, type TestProgress } from '@/entities/test-progress'
 import { formatDeadline, pluralize } from '@/shared/lib'
+import { Icon } from '@/shared/ui/icon'
+import AccessDialog from './AccessDialog.vue'
+import TestAddDialog from './TestAddDialog.vue'
 
 const props = defineProps<{ course: CourseDetails; viewer: 'student' | 'teacher' }>()
 
@@ -21,6 +24,15 @@ const progressByTest = computed(() => {
 const progressOf = (testId: number) =>
   props.viewer === 'student' ? progressByTest.value.get(testId) : undefined
 
+const addOpen = ref(false)
+const accessOpen = ref(false)
+const accessTest = ref<{ id: number; name: string } | null>(null)
+
+const openAccess = (test: { id: number; name: string }) => {
+  accessTest.value = test
+  accessOpen.value = true
+}
+
 const minutes = (seconds: number) => Math.max(1, Math.round(seconds / 60))
 
 const percent = (item: TestProgress) =>
@@ -33,9 +45,21 @@ const percent = (item: TestProgress) =>
   <section>
     <div class="flex items-baseline justify-between gap-3">
       <h2 class="text-2xl font-extrabold tracking-tight">Тесты</h2>
-      <span class="text-sm text-ink-soft">
-        {{ course.tests.length }} {{ pluralize(course.tests.length, ['тест', 'теста', 'тестов']) }}
-      </span>
+      <div class="flex items-center gap-3">
+        <span class="text-sm text-ink-soft">
+          {{ course.tests.length }}
+          {{ pluralize(course.tests.length, ['тест', 'теста', 'тестов']) }}
+        </span>
+        <button
+          v-if="viewer === 'teacher'"
+          type="button"
+          class="inline-flex items-center gap-1.5 rounded-xl bg-brand-soft px-3.5 py-2 text-sm font-semibold text-brand transition duration-200 hover:-translate-y-0.5 active:scale-[.98]"
+          @click="addOpen = true"
+        >
+          <Icon name="plus" size="18" />
+          Добавить
+        </button>
+      </div>
     </div>
 
     <ul v-if="course.tests.length" class="mt-5 space-y-3">
@@ -85,16 +109,43 @@ const percent = (item: TestProgress) =>
             Доступ не открыт
           </span>
         </template>
-        <span
-          v-else
-          class="inline-flex shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold"
-          :class="test.access_test ? 'bg-pastel-mint text-emerald-800' : 'bg-canvas text-ink-soft'"
-        >
-          {{ test.access_test ? 'Доступ открыт' : 'Доступ закрыт' }}
-        </span>
+        <template v-else>
+          <span
+            v-if="test.access_test"
+            class="inline-flex shrink-0 rounded-full bg-pastel-mint px-2.5 py-1 text-xs font-semibold text-emerald-800"
+          >
+            Доступ открыт
+          </span>
+          <button
+            v-else
+            type="button"
+            class="shrink-0 rounded-xl border border-line px-3.5 py-2 text-sm font-semibold transition duration-200 hover:-translate-y-0.5 hover:border-brand hover:text-brand active:scale-[.98]"
+            @click="openAccess(test)"
+          >
+            Открыть доступ
+          </button>
+        </template>
       </li>
     </ul>
 
-    <p v-else class="card mt-5 p-6 text-ink-soft">В этом курсе пока нет тестов.</p>
+    <div v-else class="card mt-5 flex flex-col items-center px-6 py-8 text-center">
+      <p class="font-bold">В этом курсе пока нет тестов</p>
+      <p class="mt-1 text-sm text-ink-soft">
+        {{
+          viewer === 'teacher'
+            ? 'Создайте тест с вопросами и откройте к нему доступ.'
+            : 'Преподаватель ещё не добавил тесты.'
+        }}
+      </p>
+    </div>
+
+    <template v-if="viewer === 'teacher'">
+      <TestAddDialog
+        v-model="addOpen"
+        :course-id="course.id"
+        :existing-test-ids="course.tests.map((test) => test.id)"
+      />
+      <AccessDialog v-model="accessOpen" :course-id="course.id" :test="accessTest" />
+    </template>
   </section>
 </template>

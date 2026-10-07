@@ -3,12 +3,14 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useDeleteCourse, useLeaveCourse, type CourseDetails } from '@/entities/course'
 import { ConfirmDialog } from '@/shared/ui/confirm-dialog'
+import EditCourseDialog from './EditCourseDialog.vue'
 import { Icon } from '@/shared/ui/icon'
 
 const props = defineProps<{ course: CourseDetails; viewer: 'student' | 'teacher' }>()
 
 const router = useRouter()
 const confirmOpen = ref(false)
+const editOpen = ref(false)
 
 const { mutate: leave, isPending: isLeaving } = useLeaveCourse()
 const { mutate: remove, isPending: isDeleting } = useDeleteCourse()
@@ -37,21 +39,32 @@ const onConfirm = () => {
 </script>
 
 <template>
-  <button
-    type="button"
-    class="flex w-full items-center justify-center gap-2 rounded-2xl border border-ink/10 bg-white/50 px-4 py-3 text-sm font-semibold text-red-700 transition duration-200 hover:-translate-y-0.5 hover:bg-white/80 active:scale-[.98]"
-    @click="confirmOpen = true"
-  >
-    <Icon name="logout" size="18" />
-    {{ texts.button }}
-  </button>
+  <div class="space-y-2">
+    <button
+      v-if="!isStudent"
+      type="button"
+      class="flex w-full items-center justify-center gap-2 rounded-2xl bg-white/70 px-4 py-3 text-sm font-semibold transition duration-200 hover:-translate-y-0.5 hover:bg-white active:scale-[.98]"
+      @click="editOpen = true"
+    >
+      Редактировать
+    </button>
+    <button
+      type="button"
+      class="flex w-full items-center justify-center gap-2 rounded-2xl border border-ink/10 bg-white/50 px-4 py-3 text-sm font-semibold text-red-700 transition duration-200 hover:-translate-y-0.5 hover:bg-white/80 active:scale-[.98]"
+      @click="confirmOpen = true"
+    >
+      <Icon name="logout" size="18" />
+      {{ texts.button }}
+    </button>
 
-  <ConfirmDialog
-    v-model="confirmOpen"
-    :title="texts.title"
-    :text="texts.text"
-    :confirm-label="texts.confirm"
-    :loading="isLeaving || isDeleting"
-    @confirm="onConfirm"
-  />
+    <ConfirmDialog
+      v-model="confirmOpen"
+      :title="texts.title"
+      :text="texts.text"
+      :confirm-label="texts.confirm"
+      :loading="isLeaving || isDeleting"
+      @confirm="onConfirm"
+    />
+    <EditCourseDialog v-if="!isStudent" v-model="editOpen" :course="course" />
+  </div>
 </template>

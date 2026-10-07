@@ -1,25 +1,68 @@
 <script setup lang="ts">
-import { courseColor, personInitials, personName, type CourseDetails } from '@/entities/course'
+import { ref } from 'vue'
+import {
+  courseColor,
+  personInitials,
+  personName,
+  useRemoveStudent,
+  type CourseDetails,
+  type CourseStudent,
+} from '@/entities/course'
 import { pluralize } from '@/shared/lib'
+import { ConfirmDialog } from '@/shared/ui/confirm-dialog'
+import { Icon } from '@/shared/ui/icon'
+import { toastSuccess } from '@/shared/ui/toast'
+import AddStudentsDialog from './AddStudentsDialog.vue'
 
-defineProps<{ course: CourseDetails }>()
+const props = defineProps<{ course: CourseDetails }>()
+
+const addOpen = ref(false)
+const removeOpen = ref(false)
+const toRemove = ref<CourseStudent | null>(null)
+
+const { mutate: remove, isPending: isRemoving } = useRemoveStudent(() => props.course.id)
+
+const askRemove = (student: CourseStudent) => {
+  toRemove.value = student
+  removeOpen.value = true
+}
+
+const confirmRemove = () => {
+  if (!toRemove.value) return
+  remove(toRemove.value.id, {
+    onSuccess: () => {
+      removeOpen.value = false
+      toastSuccess('Студент убран из курса')
+    },
+  })
+}
 </script>
 
 <template>
   <section class="mt-10">
-    <div class="flex items-baseline justify-between gap-3">
+    <div class="flex items-center justify-between gap-3">
       <h2 class="text-2xl font-extrabold tracking-tight">Студенты</h2>
-      <span class="text-sm text-ink-soft">
-        {{ course.students.length }}
-        {{ pluralize(course.students.length, ['человек', 'человека', 'человек']) }}
-      </span>
+      <div class="flex items-center gap-3">
+        <span class="text-sm text-ink-soft">
+          {{ course.students.length }}
+          {{ pluralize(course.students.length, ['человек', 'человека', 'человек']) }}
+        </span>
+        <button
+          type="button"
+          class="inline-flex items-center gap-1.5 rounded-xl bg-brand-soft px-3.5 py-2 text-sm font-semibold text-brand transition duration-200 hover:-translate-y-0.5 active:scale-[.98]"
+          @click="addOpen = true"
+        >
+          <Icon name="plus" size="18" />
+          Добавить
+        </button>
+      </div>
     </div>
 
     <ul v-if="course.students.length" class="mt-5 grid gap-3 sm:grid-cols-2">
       <li
         v-for="student in course.students"
         :key="student.id"
-        class="card flex items-center gap-3 p-4"
+        class="card group flex items-center gap-3 p-4"
       >
         <span
           class="grid h-10 w-10 shrink-0 place-items-center rounded-full text-sm font-bold"
@@ -27,13 +70,35 @@ defineProps<{ course: CourseDetails }>()
         >
           {{ personInitials(student) }}
         </span>
-        <div class="min-w-0">
+        <div class="min-w-0 flex-1">
           <p class="truncate font-semibold">{{ personName(student) }}</p>
           <p class="truncate text-sm text-ink-soft">{{ student.email }}</p>
         </div>
+        <button
+          type="button"
+          class="shrink-0 rounded-lg p-2 text-ink-soft opacity-60 transition hover:bg-red-50 hover:text-red-600 group-hover:opacity-100 focus-visible:opacity-100"
+          :aria-label="`Убрать из курса: ${personName(student)}`"
+          @click="askRemove(student)"
+        >
+          <Icon name="trash" size="18" />
+        </button>
       </li>
     </ul>
 
-    <p v-else class="card mt-5 p-6 text-ink-soft">В курс пока никого не добавили.</p>
+    <div v-else class="card mt-5 flex flex-col items-center px-6 py-8 text-center">
+      <p class="font-bold">В курсе пока никого нет</p>
+      <p class="mt-1 text-sm text-ink-soft">Добавьте студентов, и они увидят материалы и тесты.</p>
+    </div>
+
+    <AddStudentsDialog v-model="addOpen" :course-id="course.id" />
+
+    <ConfirmDialog
+      v-model="removeOpen"
+      title="Убрать студента?"
+      :text="`${toRemove ? personName(toRemove) : ''} перестанет видеть курс. Его результаты сохранятся.`"
+      confirm-label="Убрать"
+      :loading="isRemoving"
+      @confirm="confirmRemove"
+    />
   </section>
 </template>
