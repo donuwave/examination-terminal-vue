@@ -24,6 +24,12 @@ const progressByTest = computed(() => {
 const progressOf = (testId: number) =>
   props.viewer === 'student' ? progressByTest.value.get(testId) : undefined
 
+const actionLabel: Partial<Record<number, string>> = {
+  1: 'Начать',
+  2: 'Продолжить',
+  3: 'Результат',
+}
+
 const addOpen = ref(false)
 const accessOpen = ref(false)
 const accessTest = ref<{ id: number; name: string } | null>(null)
@@ -101,7 +107,21 @@ const percent = (item: TestProgress) =>
         </div>
 
         <template v-if="viewer === 'student'">
-          <StatusChip v-if="progressOf(test.id)" :status="progressOf(test.id)!.status" />
+          <div v-if="progressOf(test.id)" class="flex shrink-0 items-center gap-3">
+            <StatusChip :status="progressOf(test.id)!.status" />
+            <RouterLink
+              v-if="progressOf(test.id)!.status !== 4"
+              :to="`/tests/${progressOf(test.id)!.id}`"
+              class="rounded-xl px-4 py-2 text-sm font-semibold transition duration-200 hover:-translate-y-0.5 active:scale-[.98]"
+              :class="
+                progressOf(test.id)!.status === 3
+                  ? 'bg-canvas hover:bg-line'
+                  : 'bg-brand text-white shadow-[0_6px_16px_-6px_rgba(47,107,255,.6)]'
+              "
+            >
+              {{ actionLabel[progressOf(test.id)!.status] }}
+            </RouterLink>
+          </div>
           <span
             v-else
             class="inline-flex shrink-0 rounded-full bg-canvas px-2.5 py-1 text-xs font-semibold text-ink-soft"

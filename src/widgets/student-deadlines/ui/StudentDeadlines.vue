@@ -197,24 +197,25 @@ const legend = [
 
           <ScrollArea v-else-if="selectedItems.length" :key="selected" class="h-full">
             <ul class="divide-y divide-line pr-3">
-              <li
-                v-for="item in selectedItems"
-                :key="item.id"
-                class="grid min-h-[78px] grid-cols-[4rem_1fr] items-center gap-x-4 gap-y-2 py-4 sm:grid-cols-[4rem_1fr_auto]"
-              >
-                <p class="text-xl font-extrabold tabular-nums">
-                  {{ formatTime(item.deadline_date) }}
-                </p>
-                <div class="min-w-0">
-                  <p class="font-bold">{{ item.test.name }}</p>
-                  <p class="mt-0.5 text-sm text-ink-soft">
-                    {{ formatDuration(item.timelimit) }} на прохождение
+              <li v-for="item in selectedItems" :key="item.id">
+                <RouterLink
+                  :to="`/tests/${item.id}`"
+                  class="grid min-h-[78px] grid-cols-[4rem_1fr] items-center gap-x-4 gap-y-2 py-4 sm:grid-cols-[4rem_1fr_auto] rounded-2xl transition duration-200 hover:bg-canvas/70 sm:-mx-3 sm:px-3"
+                >
+                  <p class="text-xl font-extrabold tabular-nums">
+                    {{ formatTime(item.deadline_date) }}
                   </p>
-                </div>
-                <StatusChip
-                  class="col-start-2 justify-self-start sm:col-start-3"
-                  :status="item.status"
-                />
+                  <div class="min-w-0">
+                    <p class="font-bold">{{ item.test.name }}</p>
+                    <p class="mt-0.5 text-sm text-ink-soft">
+                      {{ formatDuration(item.timelimit) }} на прохождение
+                    </p>
+                  </div>
+                  <StatusChip
+                    class="col-start-2 justify-self-start sm:col-start-3"
+                    :status="item.status"
+                  />
+                </RouterLink>
               </li>
             </ul>
           </ScrollArea>

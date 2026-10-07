@@ -27,6 +27,12 @@ const router = createRouter({
       component: () => import('@/pages/reset-password-new'),
     },
     {
+      path: '/tests/:id',
+      name: 'test-run',
+      component: () => import('@/pages/test-run'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/',
       component: () => import('@/app/layouts/AppLayout.vue'),
       meta: { requiresAuth: true },

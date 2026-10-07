@@ -8,6 +8,7 @@ defineProps<{
   confirmLabel: string
   cancelLabel?: string
   loading?: boolean
+  variant?: 'danger' | 'primary'
 }>()
 
 const emit = defineEmits<{ confirm: [] }>()
@@ -23,7 +24,7 @@ const open = defineModel<boolean>({ default: false })
       <BaseButton variant="secondary" :disabled="loading" @click="open = false">
         {{ cancelLabel ?? 'Отмена' }}
       </BaseButton>
-      <BaseButton variant="danger" :loading="loading" @click="emit('confirm')">
+      <BaseButton :variant="variant ?? 'danger'" :loading="loading" @click="emit('confirm')">
         {{ confirmLabel }}
       </BaseButton>
     </div>
