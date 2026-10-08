@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
-defineProps<{ title: string; maxWidth?: string }>()
+defineProps<{
+  title: string
+  maxWidth?: string
+  /** Внутренние отступы панели; `p-0`, если шапку и подвал делает вызывающий код. */
+  padding?: string
+  panelClass?: string
+}>()
 
 const open = defineModel<boolean>({ default: false })
 const panel = ref<HTMLElement>()
@@ -41,8 +47,8 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKeydown))
           aria-modal="true"
           :aria-label="title"
           tabindex="-1"
-          class="dialog-panel card w-full p-6 outline-none"
-          :class="maxWidth ?? 'max-w-sm'"
+          class="dialog-panel card w-full outline-none"
+          :class="[maxWidth ?? 'max-w-sm', padding ?? 'p-6', panelClass]"
         >
           <slot />
         </div>
