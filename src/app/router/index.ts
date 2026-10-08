@@ -38,14 +38,24 @@ const router = createRouter({
       meta: { requiresAuth: true },
       children: [
         { path: '', name: 'home', component: () => import('@/pages/home') },
-        { path: 'courses', name: 'courses', component: () => import('@/pages/courses') },
+        {
+          path: 'courses',
+          name: 'courses',
+          component: () => import('@/pages/courses'),
+          meta: { fixed: true },
+        },
         { path: 'profile', name: 'profile', component: () => import('@/pages/profile') },
         {
           path: 'courses/:id/tests/:testId/results',
           name: 'test-results',
           component: () => import('@/pages/test-results'),
         },
-        { path: 'courses/:id', name: 'course', component: () => import('@/pages/course') },
+        {
+          path: 'courses/:id',
+          name: 'course',
+          component: () => import('@/pages/course'),
+          meta: { fixed: true },
+        },
       ],
     },
     { path: '/:pathMatch(.*)*', redirect: '/' },

@@ -72,7 +72,7 @@ const percent = (item: TestProgress) =>
       <li
         v-for="test in course.tests"
         :key="test.id"
-        class="card flex items-center gap-5 p-5 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_24px_-8px_rgba(31,36,48,.14)]"
+        class="card flex flex-wrap items-center gap-x-5 gap-y-3 p-5 transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_24px_-8px_rgba(31,36,48,.14)]"
       >
         <div
           class="grid h-16 w-16 shrink-0 place-content-center rounded-2xl text-center"
@@ -84,8 +84,8 @@ const percent = (item: TestProgress) =>
           <p class="mt-1 text-[11px] font-medium text-ink/70">мин</p>
         </div>
 
-        <div class="min-w-0 flex-1">
-          <p class="text-lg font-bold">{{ test.name }}</p>
+        <div class="min-w-[9rem] flex-1">
+          <p class="break-words text-lg font-bold">{{ test.name }}</p>
 
           <template v-if="progressOf(test.id)">
             <div v-if="progressOf(test.id)!.status === 3" class="mt-2 flex items-center gap-3">
@@ -107,7 +107,7 @@ const percent = (item: TestProgress) =>
         </div>
 
         <template v-if="viewer === 'student'">
-          <div v-if="progressOf(test.id)" class="flex shrink-0 items-center gap-3">
+          <div v-if="progressOf(test.id)" class="ml-auto flex shrink-0 items-center gap-3">
             <StatusChip :status="progressOf(test.id)!.status" />
             <RouterLink
               v-if="progressOf(test.id)!.status !== 4"
@@ -124,13 +124,13 @@ const percent = (item: TestProgress) =>
           </div>
           <span
             v-else
-            class="inline-flex shrink-0 rounded-full bg-canvas px-2.5 py-1 text-xs font-semibold text-ink-soft"
+            class="ml-auto inline-flex shrink-0 rounded-full bg-canvas px-2.5 py-1 text-xs font-semibold text-ink-soft"
           >
             Доступ не открыт
           </span>
         </template>
         <template v-else>
-          <div v-if="test.access_test" class="flex shrink-0 items-center gap-3">
+          <div v-if="test.access_test" class="ml-auto flex shrink-0 items-center gap-3">
             <span
               class="inline-flex rounded-full bg-pastel-mint px-2.5 py-1 text-xs font-semibold text-emerald-800"
             >
@@ -146,7 +146,7 @@ const percent = (item: TestProgress) =>
           <button
             v-else
             type="button"
-            class="shrink-0 rounded-xl border border-line px-3.5 py-2 text-sm font-semibold transition duration-200 hover:-translate-y-0.5 hover:border-brand hover:text-brand active:scale-[.98]"
+            class="ml-auto shrink-0 rounded-xl border border-line px-3.5 py-2 text-sm font-semibold transition duration-200 hover:-translate-y-0.5 hover:border-brand hover:text-brand active:scale-[.98]"
             @click="openAccess(test)"
           >
             Открыть доступ

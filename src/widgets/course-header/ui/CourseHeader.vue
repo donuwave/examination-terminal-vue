@@ -28,7 +28,10 @@ const stats = computed(() => {
 </script>
 
 <template>
-  <aside class="flex flex-col rounded-card p-7 lg:min-h-[560px]" :class="courseColor(course.id)">
+  <aside
+    class="flex flex-col rounded-card p-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    :class="courseColor(course.id)"
+  >
     <span
       v-if="course.category"
       class="mb-3 inline-flex rounded-full bg-white/60 px-3 py-1 text-xs font-semibold"
@@ -36,9 +39,9 @@ const stats = computed(() => {
       {{ course.category.name }}
     </span>
     <h1 class="text-3xl font-extrabold leading-tight tracking-tight">{{ course.name }}</h1>
-    <p class="mt-4 leading-relaxed text-ink/75">{{ course.description }}</p>
+    <p class="mt-3 leading-relaxed text-ink/75">{{ course.description }}</p>
 
-    <div class="mt-8 flex items-center gap-4 border-t border-ink/10 pt-6">
+    <div class="mt-6 flex items-center gap-4 border-t border-ink/10 pt-5">
       <span
         class="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-white/70 text-base font-bold"
       >
@@ -51,18 +54,18 @@ const stats = computed(() => {
       </div>
     </div>
 
-    <dl class="mt-6 space-y-2">
+    <dl class="mt-5 space-y-2">
       <div
         v-for="stat in stats"
         :key="stat.label"
-        class="flex items-center justify-between gap-3 rounded-2xl bg-white/60 px-4 py-3.5"
+        class="flex items-center justify-between gap-3 rounded-2xl bg-white/60 px-4 py-3"
       >
         <dt class="text-sm text-ink/70">{{ stat.label }}</dt>
         <dd class="text-xl font-extrabold tabular-nums">{{ stat.value }}</dd>
       </div>
     </dl>
 
-    <div class="mt-auto pt-8">
+    <div class="mt-auto pt-6">
       <slot name="actions" />
     </div>
   </aside>
